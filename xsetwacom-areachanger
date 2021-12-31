@@ -1,0 +1,87 @@
+#!/bin/bash
+
+
+#default values. change them for quick use
+#to revert changes, restart the session or re-run the program with "1.0" resolutionMultiplier value
+defaultTabletName="Wacom Intuos PT S 2 Pen stylus"
+defaultScreenResolution=(1525 858)
+defaultResolutionMultiplier=6
+
+echo "https://github.com/clod44/xsetwacom-areachanger"
+
+
+tempCommand="xsetwacom --list devices"
+echo "detected devices:"
+$tempCommand
+
+echo ""
+
+echo "Tablet Name: "
+echo "(blank for default value = "$defaultTabletName"): "
+read -p ">> " tabletName
+if (( ${#tabletName}==0 ))
+then
+	tabletName=$defaultTabletName
+fi
+echo "Tablet name picked as "$tabletName
+
+
+echo ""
+
+screenResolution=(0 0)
+echo 'Screen Resolution Width and Height: '
+echo '(leave both blank for default value = '${defaultScreenResolution[@]}'): '
+read -p "Width >> " screenWidth
+read -p "Height >> " screenHeight
+if (( ${#screenWidth}==0 || ${#screenHeight}==0 ))
+then
+	screenResolution=(${defaultScreenResolution[0]} ${defaultScreenResolution[1]})
+else
+	screenResolution=($screenWidth $screenHeight)
+fi
+echo "Screen resolution picked as ${screenResolution[@]}"
+
+
+echo ""
+
+
+echo 'Resolution multiplier: '
+echo '(min 1.0)(blank for default value = '$defaultResolutionMultiplier'): '
+read -p ">> " resolutionMultiplier
+if (( ${#resolutionMultiplier}==0 ))
+then
+	resolutionMultiplier=$defaultResolutionMultiplier
+fi
+echo "Resolution multiplier picked as "$resolutionMultiplier
+
+
+echo ""
+
+
+newScreenResolution=($((${screenResolution[0]}*$resolutionMultiplier)) $((${screenResolution[1]}*$resolutionMultiplier)))
+offsets=($(($(($resolutionMultiplier-1))*$((${screenResolution[0]}/2)))) $(($(($resolutionMultiplier-1))*$((${screenResolution[1]}/2)))))
+
+echo "executing the following:"
+echo ""
+areaCommand="xsetwacom --set \"$tabletName\" MapToOutput ${newScreenResolution[0]}x${newScreenResolution[1]}+-${offsets[0]}+-${offsets[1]}"
+echo $areaCommand
+
+xsetwacom --set "$tabletName" MapToOutput ${newScreenResolution[0]}x${newScreenResolution[1]}+-${offsets[0]}+-${offsets[1]}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
